@@ -1,0 +1,40 @@
+<style>
+    .click-pop {
+        position: fixed;
+        z-index: 9999;
+        pointer-events: none;
+        user-select: none;
+        font-weight: bold;
+        font-size: 1.4rem;
+        white-space: nowrap;
+        transform: translate(-50%, -50%);
+        animation: click-pop 0.9s ease-out forwards;
+    }
+
+    @keyframes click-pop {
+        to {
+            opacity: 0;
+            transform: translate(-50%, -180%) scale(1.2);
+        }
+    }
+</style>
+<script>
+    (() => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const words = ["Bug -1", "Coffee +1", "🚀", "💻", "✨", "Hello World", "git push", "200 OK", "Exp +10", "🐛→🦋"];
+        const colors = ["#4f46e5", "#ec4899", "#f59e0b", "#10b981", "#06b6d4", "#8b5cf6"];
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        document.addEventListener("click", (e) => {
+            const el = document.createElement("span");
+            el.className = "click-pop";
+            el.textContent = pick(words);
+            el.style.left = e.clientX + "px";
+            el.style.top = e.clientY + "px";
+            el.style.color = pick(colors);
+            document.body.appendChild(el);
+            el.addEventListener("animationend", () => el.remove());
+        });
+    })();
+</script>

@@ -1,0 +1,37 @@
+// 主题色
+:root {
+    --accent-color: #4f46e5;
+    --accent-color-darker: #4338ca;
+    --accent-color-text: #fff;
+
+    --body-background: #f4f5fb;
+    --card-border-radius: 14px;
+    --tag-border-radius: 6px;
+
+    &[data-scheme="dark"] {
+        --accent-color: #818cf8;
+        --accent-color-darker: #6366f1;
+        --accent-color-text: #0f172a;
+
+        --body-background: #1e1f26;
+        --card-background: #2a2b36;
+    }
+}
+
+// 文章卡片悬停上浮
+.article-list article {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
+}
+
+// 文章内链接和标题使用主题色
+.article-content a {
+    color: var(--accent-color);
+}
+
+.article-title a:hover {
+    color: var(--accent-color);
+}
