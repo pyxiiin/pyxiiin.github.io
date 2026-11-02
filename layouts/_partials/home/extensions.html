@@ -1,0 +1,77 @@
+<script>
+  (() => {
+    const tagline = document.querySelector(".about h2");
+    if (!tagline) return;
+
+    const finalText = tagline.textContent.trim();
+    tagline.classList.add("tagline");
+    tagline.title = "点我重新编译";
+    tagline.innerHTML =
+      '<span class="tagline__text"></span><span class="tagline__check">✓</span><span class="tagline__cursor"></span>';
+    const out = tagline.querySelector(".tagline__text");
+
+    const showFinal = () => {
+      out.textContent = finalText;
+      tagline.classList.add("is-done");
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      showFinal();
+      return;
+    }
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+
+    const type = async (text, delay = 70) => {
+      out.textContent = "";
+      for (const ch of text) {
+        out.textContent += ch;
+        await sleep(delay);
+      }
+    };
+
+    const spin = async (label, duration) => {
+      const frames = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏";
+      const start = performance.now();
+      for (let i = 0; performance.now() - start < duration; i++) {
+        out.textContent = `${frames[i % frames.length]} ${label}`;
+        await sleep(80);
+      }
+    };
+
+    const countDown = async (duration) => {
+      const errors = randInt(12, 48);
+      const warnings = randInt(30, 99);
+      const start = performance.now();
+      for (;;) {
+        const t = Math.min(1, (performance.now() - start) / duration);
+        const k = 1 - Math.pow(1 - t, 3);
+        const e = Math.round(errors * (1 - k));
+        const w = Math.round(warnings * (1 - k));
+        out.innerHTML =
+          `<span class="${e ? "is-error" : "is-ok"}">${e} ERROR</span> ` +
+          `<span class="${w ? "is-warning" : "is-ok"}">${w} WARNING</span>`;
+        if (t === 1) break;
+        await sleep(45);
+      }
+    };
+
+    let running = false;
+    const run = async () => {
+      if (running) return;
+      running = true;
+      tagline.classList.remove("is-done");
+      await type("$ hugo build");
+      await sleep(350);
+      await spin("compiling...", 1300);
+      await countDown(1500);
+      await sleep(250);
+      showFinal();
+      running = false;
+    };
+
+    tagline.addEventListener("click", run);
+    run();
+  })();
+</script>

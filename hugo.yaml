@@ -1,6 +1,6 @@
 baseURL: https://pyxiiin.github.io/
 locale: zh-cn
-title: Xin P.Y. 的技术博客
+title: Xin P.Y.'s Homepage
 theme: hugo-coder
 defaultContentLanguage: zh-cn
 hasCJKLanguage: true
@@ -18,13 +18,15 @@ taxonomies:
 
 params:
   author: Xin P.Y.
-  description: Xin P.Y. 的技术博客
+  description: Xin P.Y.'s personal homepage and tech blog
   info:
-    - 记录技术、踩坑与成长
+    - 0 ERROR 0 WARNING
   dateFormat: "2006-01-02"
   since: 2026
   colorScheme: auto
   hideColorSchemeToggle: false
+  customSCSS:
+    - scss/custom.scss
   social:
     - name: GitHub
       icon: fa-brands fa-github fa-2x
@@ -33,13 +35,13 @@ params:
 
 menu:
   main:
-    - name: 博客
+    - name: Blog
       url: post/
       weight: 1
-    - name: 分类
+    - name: Categories
       url: categories/
       weight: 2
-    - name: 标签
+    - name: Tags
       url: tags/
       weight: 3
 

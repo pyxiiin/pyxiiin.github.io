@@ -1,0 +1,10 @@
+[categories]
+one = "Categories"
+other = "Categories"
+
+[tags]
+one = "Tags"
+other = "Tags"
+
+[powered_by]
+other = "Powered by"
