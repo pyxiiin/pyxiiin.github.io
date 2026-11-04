@@ -19,25 +19,59 @@ draft: false
 ## 实现原理（挖坑法）
 1. 设置两个变量 low、high，排序开始时：low=0，high=size-1。
 2. 整个数组找基准正确位置，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面
-
-2.1 默认数组的第一个数为基准数据，赋值给key，即key=array[low]。
-2.2 因为默认数组的第一个数为基准，所以从后面开始向前搜索（high–），找到第一个小于key的array[high]，就将 array[high] 赋给 array[low]，即 array[low] = array[high]。（循环条件是 array[high] >= key；结束时 array[high] < key）
-2.3 此时从前面开始向后搜索（low++），找到第一个大于key的array[low]，就将 array[low] 赋给 array[high]，即 array[high] = array[low]。（循环条件是 array[low] <= key；结束时 array[low] > key）
-2.4 循环 2.2-2.3 步骤，直到 low=high，该位置就是基准位置。
-2.5 把基准数据赋给当前位置。
+    - 2.1 默认数组的第一个数为基准数据，赋值给key，即key=array[low]。
+    - 2.2 因为默认数组的第一个数为基准，所以从后面开始向前搜索（`high--`），找到第一个小于key的array[high]，就将 array[high] 赋给 array[low]，即 array[low] = array[high]。（循环条件是 array[high] >= key；结束时 array[high] < key）
+    - 2.3 此时从前面开始向后搜索（`low++`），找到第一个大于key的array[low]，就将 array[low] 赋给 array[high]，即 array[high] = array[low]。（循环条件是 array[low] <= key；结束时 array[low] > key）
+    - 2.4 循环 2.2-2.3 步骤，直到 low=high，该位置就是基准位置。
+    - 2.5 把基准数据赋给当前位置。
 3. 第一趟找到的基准位置，作为下一趟的分界点。
 4. 递归调用（recursive）分界点前和分界点后的子数组 排序，重复2、3、4的步骤。
 5. 最终就会得到排序好的数组。
 
+```cpp
+#include <vector>
+using namespace std;
+
+int getStandard(vector<int> &nums, int left, int right) {
+    int key = nums[left];
+    while (left < right) {
+        while (left < right && nums[right] >= key) {
+            --right;
+        }
+        if (left < right) {
+            nums[left] = nums[right];
+        }
+        
+        while (left < right && nums[left] <= key) {
+            ++left;
+        }
+        if (left < right) {
+            nums[right] = nums[left];
+        }
+        
+    }
+    nums[left] = key;
+    return left;
+}
+
+void quickSort(vector<int> &nums, int left, int right) {
+    if (left < right) {
+        int standard = getStandard(nums);
+        quickSort(nums, left, standard-1);
+        quickSort(nums, standard+1, right);
+    }
+}
+```
+
+
 ## 实现原理（Lomuto 分区）
 1. 设置两个变量 left、right，排序开始时：left=0，right=size-1。
 2. 整个数组找基准正确位置，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面
-
-2.1 默认数组的最后一个数为基准数据，赋值给pivot，即pivot=array[right]。
-2.2 设置变量 i=left，i 表示「小于等于区」的下一个空位。
-2.3 用 j 从 left 扫描到 right-1（只从左往右扫一遍）。
-2.4 如果 array[j] <= pivot，就把 array[i] 和 array[j] 交换，然后 i++；如果 array[j] > pivot，什么都不做，继续 j++。
-2.5 扫描结束后，把 array[i] 和 array[right] 交换，把基准放到最终位置；此时 i 就是基准位置，左边都 ≤ pivot，右边都 > pivot。
+    - 2.1 默认数组的最后一个数为基准数据，赋值给pivot，即pivot=array[right]。
+    - 2.2 设置变量 i=left，i 表示「小于等于区」的下一个空位。
+    - 2.3 用 j 从 left 扫描到 right-1（只从左往右扫一遍）。
+    - 2.4 如果 array[j] <= pivot，就把 array[i] 和 array[j] 交换，然后 i++；如果 array[j] > pivot，什么都不做，继续 j++。
+    - 2.5 扫描结束后，把 array[i] 和 array[right] 交换，把基准放到最终位置；此时 i 就是基准位置，左边都 ≤ pivot，右边都 > pivot。
 3. 第一趟找到的基准位置，作为下一趟的分界点。
 4. 递归调用（recursive）分界点前和分界点后的子数组排序，重复2、3、4的步骤。
 5. 最终就会得到排序好的数组。
@@ -50,38 +84,26 @@ draft: false
 #include <vector>
 #include <algorithm>
 
-int partition(std::vector<int>& a, int left, int right) {
-    int pivot = a[right];          // 选最右边作为基准
-    int i = left;                  // i 指向「小于等于区」的下一个空位
+int getStandard(vector<int> &nums, int left, int right) {
+    int key = nums[right];
+    int i = left;
     for (int j = left; j < right; ++j) {
-        if (a[j] <= pivot) {
-            std::swap(a[i], a[j]);
+        if (nums[j] <= key) {
+            swap(nums[i], nums[j]);
             ++i;
         }
     }
-    std::swap(a[i], a[right]);     // 把 pivot 放到最终位置
+    swap(nums[i], nums[right]);
     return i;
 }
 
-void quickSort(std::vector<int>& a, int left, int right) {
-    if (left >= right) return;
-    int p = partition(a, left, right);
-    quickSort(a, left, p - 1);
-    quickSort(a, p + 1, right);
+void quickSort(vector<int> &nums, int left, int right) {
+    if (left < right) {
+        int standard = getStandard(nums, int left, int right);
+        quickSort(nums, left, standard-1);
+        quickSort(nums, standard+1, right);
+    }
 }
-
-void quickSort(std::vector<int>& a) {
-    if (a.empty()) return;
-    quickSort(a, 0, static_cast<int>(a.size()) - 1);
-}
-```
-
-跑一遍小例子，心里会更清楚：
-
-```text
-[3, 6, 8, 10, 1, 2, 1]  pivot = 1（最后一个）
-分区后大致变成：
-[1, 1, ...] 再分别递归左右两侧
 ```
 
 ## 复杂度
@@ -117,7 +139,3 @@ C++ 的 `std::sort` 要求平均 O(n log n)，实现通常是**内省排序**（
 - 要稳定、或链表场景：更常想到归并
 - 只要前 k 大 / 保证最坏 O(n log n)：堆排序思路有用
 - 一般数组原地排序、平均性能优先：快排（或标准库的 `std::sort`）
-
-## 小结
-
-快排的关键是**分区**：把 pivot 放到最终位置，并保证左右有序区间的边界正确。代码写对之后，面试重点通常不在背模板，而在讲清最坏情况、稳定性，以及和标准库排序的关系。
