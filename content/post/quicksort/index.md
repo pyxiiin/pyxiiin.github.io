@@ -1,5 +1,5 @@
 ---
-title: '快速排序：原理、C++ 实现与面试要点'
+title: '快速排序算法：原理与C++实现'
 description: '用 C++ 讲清楚快速排序的分治思想、分区写法、复杂度，以及面试常问坑点'
 date: '2026-11-02T22:50:26+08:00'
 slug: 'quicksort'
@@ -16,11 +16,35 @@ draft: false
 2. 把数组分成两半：左边都 ≤ pivot，右边都 ≥ pivot。
 3. 对左右两边递归排序。
 
-和归并排序不同，快排的“分”比较贵（分区），“合”几乎免费（原地完成，无需合并）。
+## 实现原理（挖坑法）
+1. 设置两个变量 low、high，排序开始时：low=0，high=size-1。
+2. 整个数组找基准正确位置，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面
+
+2.1 默认数组的第一个数为基准数据，赋值给key，即key=array[low]。
+2.2 因为默认数组的第一个数为基准，所以从后面开始向前搜索（high–），找到第一个小于key的array[high]，就将 array[high] 赋给 array[low]，即 array[low] = array[high]。（循环条件是 array[high] >= key；结束时 array[high] < key）
+2.3 此时从前面开始向后搜索（low++），找到第一个大于key的array[low]，就将 array[low] 赋给 array[high]，即 array[high] = array[low]。（循环条件是 array[low] <= key；结束时 array[low] > key）
+2.4 循环 2.2-2.3 步骤，直到 low=high，该位置就是基准位置。
+2.5 把基准数据赋给当前位置。
+3. 第一趟找到的基准位置，作为下一趟的分界点。
+4. 递归调用（recursive）分界点前和分界点后的子数组 排序，重复2、3、4的步骤。
+5. 最终就会得到排序好的数组。
+
+## 实现原理（Lomuto 分区）
+1. 设置两个变量 left、right，排序开始时：left=0，right=size-1。
+2. 整个数组找基准正确位置，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面
+
+2.1 默认数组的最后一个数为基准数据，赋值给pivot，即pivot=array[right]。
+2.2 设置变量 i=left，i 表示「小于等于区」的下一个空位。
+2.3 用 j 从 left 扫描到 right-1（只从左往右扫一遍）。
+2.4 如果 array[j] <= pivot，就把 array[i] 和 array[j] 交换，然后 i++；如果 array[j] > pivot，什么都不做，继续 j++。
+2.5 扫描结束后，把 array[i] 和 array[right] 交换，把基准放到最终位置；此时 i 就是基准位置，左边都 ≤ pivot，右边都 > pivot。
+3. 第一趟找到的基准位置，作为下一趟的分界点。
+4. 递归调用（recursive）分界点前和分界点后的子数组排序，重复2、3、4的步骤。
+5. 最终就会得到排序好的数组。
 
 ## C++ 实现（Lomuto 分区）
 
-面试里最常见、最好讲清楚的是 Lomuto 分区：从左往右扫，把小于等于 pivot 的元素换到前面。
+下面代码对应上一节的 Lomuto 分区：从左往右扫，把小于等于 pivot 的元素换到前面。
 
 ```cpp
 #include <vector>
