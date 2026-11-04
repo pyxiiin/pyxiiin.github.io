@@ -162,3 +162,15 @@ $tagline-gradient: linear-gradient(90deg, #22c55e, #06b6d4 55%, #a855f7);
     text-shadow: none;
   }
 }
+
+// 文章里「有序列表下的子步骤」（如 2.1、2.2）：去掉重复的圆点，换行时与正文对齐
+.post-content ol > li > ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.4rem 0;
+
+  > li {
+    padding-left: 1.8em;
+    text-indent: -1.8em;
+  }
+}
