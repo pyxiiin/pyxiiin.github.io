@@ -163,6 +163,92 @@ $tagline-gradient: linear-gradient(90deg, #22c55e, #06b6d4 55%, #a855f7);
   }
 }
 
+// 两侧的稀疏注意力图样装饰：画布由 layouts/_partials/body/attention-decor.html 驱动。
+// 内容区是 90rem 居中，所以每侧 gutter 为 (100vw - 90rem) / 2，窄屏下直接不渲染。
+.attn-decor {
+  display: none;
+}
+
+@media only screen and (min-width: 1360px) {
+  .attn-decor {
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    width: calc((100vw - 90rem) / 2);
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .attn-decor--left {
+    left: 0;
+  }
+
+  .attn-decor--right {
+    right: 0;
+  }
+
+  .attn-decor__inner {
+    width: calc(100% - 5rem);
+    max-width: 20rem;
+    opacity: 0;
+    animation: attn-decor-in 1.6s 0.4s ease-out forwards;
+  }
+
+  .attn-decor__canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+
+  // 右侧水平镜像，让两张图样对称地框住正文
+  .attn-decor--right .attn-decor__canvas {
+    transform: scaleX(-1);
+  }
+
+  .attn-decor__label {
+    display: block;
+    margin-top: 1rem;
+    font-family: $mono;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+    color: currentColor;
+    opacity: 0.3;
+  }
+}
+
+@keyframes attn-decor-in {
+  to {
+    opacity: var(--attn-decor-opacity);
+  }
+}
+
+// 浅色背景下同样的颜色观感更淡，整体提一档
+.attn-decor {
+  --attn-decor-opacity: 0.75;
+}
+
+.colorscheme-light .attn-decor {
+  --attn-decor-opacity: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  .colorscheme-auto .attn-decor {
+    --attn-decor-opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attn-decor__inner {
+    animation: none;
+    opacity: var(--attn-decor-opacity);
+  }
+}
+
 // 文章里「有序列表下的子步骤」（如 2.1、2.2）：去掉重复的圆点，换行时与正文对齐
 .post-content ol > li > ul {
   list-style: none;
