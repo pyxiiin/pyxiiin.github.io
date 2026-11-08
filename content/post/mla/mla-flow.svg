@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="1030" viewBox="0 0 980 1030" style="font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,Noto Sans CJK SC,sans-serif;">
 <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b7280"/></marker></defs>
 <rect x="2" y="2" width="976" height="1026" rx="14" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
-<text x="490.0" y="28" text-anchor="middle" font-size="15" fill="#111827" font-weight="bold"><tspan>MLA 一次前向的完整数据流（DeepSeek-V2：128 头，每头 128 维，RoPE 段每头 64 维）</tspan></text>
+<text x="490.0" y="28" text-anchor="middle" font-size="15" fill="#111827" font-weight="bold"><tspan>MLA 一次前向的完整数据流（DeepSeek-V2：s 为当前处理的 token 数；128 头，每头 128 维，RoPE 段每头 64 维）</tspan></text>
 <rect x="370" y="44" width="240" height="48" rx="10" fill="#f9fafb" stroke="#9ca3af" stroke-width="1.5"/>
 <text x="490" y="75" text-anchor="middle" font-size="15" fill="#111827" font-weight="bold" font-style="italic"><tspan>h</tspan><tspan dy="5" font-size="11">t</tspan></text>
-<text x="545" y="75" text-anchor="start" font-size="12" fill="#6b7280"><tspan>　1×5120 · 当前层输入</tspan></text>
+<text x="545" y="75" text-anchor="start" font-size="12" fill="#6b7280"><tspan>　s×5120 · 当前层输入</tspan></text>
 <line x1="490" y1="92" x2="190" y2="124" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <line x1="490" y1="92" x2="490" y2="124" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <line x1="490" y1="92" x2="790" y2="124" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -16,17 +16,17 @@
 <text x="296" y="128" text-anchor="middle" font-size="11" fill="#c2410c"><tspan>进缓存</tspan></text>
 <text x="190" y="150" text-anchor="middle" font-size="14" fill="#111827" font-weight="bold" font-style="italic"><tspan>c</tspan><tspan dy="5" font-size="10">t</tspan><tspan dy="-12" font-size="10">KV</tspan></text>
 <text x="190" y="170" text-anchor="middle" font-size="12" fill="#6b7280"><tspan>= h</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-5">(W</tspan><tspan dy="-7" font-size="9">DKV</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan></text>
-<text x="190" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>1×512</tspan></text>
+<text x="190" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>s×512</tspan></text>
 <rect x="350" y="124" width="280" height="72" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
 <text x="490" y="150" text-anchor="middle" font-size="14" fill="#111827" font-weight="bold" font-style="italic"><tspan>c</tspan><tspan dy="5" font-size="10">t</tspan><tspan dy="-12" font-size="10">Q</tspan></text>
 <text x="490" y="170" text-anchor="middle" font-size="12" fill="#6b7280"><tspan>= h</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-5">(W</tspan><tspan dy="-7" font-size="9">DQ</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan></text>
-<text x="490" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>1×1536</tspan></text>
+<text x="490" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>s×1536</tspan></text>
 <rect x="650" y="124" width="280" height="72" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
 <rect x="872" y="114" width="48" height="20" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="1.2"/>
 <text x="896" y="128" text-anchor="middle" font-size="11" fill="#c2410c"><tspan>进缓存</tspan></text>
 <text x="790" y="150" text-anchor="middle" font-size="14" fill="#111827" font-weight="bold" font-style="italic"><tspan>k</tspan><tspan dy="5" font-size="10">t</tspan><tspan dy="-12" font-size="10">R</tspan></text>
 <text x="790" y="170" text-anchor="middle" font-size="12" fill="#6b7280"><tspan>= RoPE(h</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-5">(W</tspan><tspan dy="-7" font-size="9">KR</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan><tspan dy="7">)</tspan></text>
-<text x="790" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>1×64 · 所有头共享</tspan></text>
+<text x="790" y="188" text-anchor="middle" font-size="12" fill="#111827"><tspan>s×64 · 所有头共享</tspan></text>
 <line x1="190" y1="196" x2="190" y2="246" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <line x1="490" y1="196" x2="490" y2="246" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <line x1="790" y1="196" x2="790" y2="386" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
@@ -34,13 +34,13 @@
 <rect x="50" y="246" width="280" height="100" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
 <text x="190" y="272" text-anchor="middle" font-size="12" fill="#111827"><tspan>k</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">C</tspan><tspan dy="7"> = c</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">KV</tspan><tspan dy="7">(W</tspan><tspan dy="-7" font-size="9">UK</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan></text>
 <text x="190" y="292" text-anchor="middle" font-size="12" fill="#111827"><tspan>v</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">C</tspan><tspan dy="7"> = c</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">KV</tspan><tspan dy="7">(W</tspan><tspan dy="-7" font-size="9">UV</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan></text>
-<text x="190" y="308" text-anchor="middle" font-size="12" fill="#111827"><tspan>各 1×16384（128头×128）</tspan></text>
+<text x="190" y="308" text-anchor="middle" font-size="12" fill="#111827"><tspan>各 s×16384（128头×128）</tspan></text>
 <text x="190" y="332" text-anchor="middle" font-size="11" fill="#6b7280"><tspan>推理时被吸收，不必真正算出</tspan></text>
 <rect x="350" y="246" width="280" height="100" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
 <text x="490" y="272" text-anchor="middle" font-size="12" fill="#111827"><tspan>q</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">C</tspan><tspan dy="7"> = c</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">Q</tspan><tspan dy="7">(W</tspan><tspan dy="-7" font-size="9">UQ</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan></text>
-<text x="490" y="292" text-anchor="middle" font-size="12" fill="#111827"><tspan>→ 1×16384（128头×128）</tspan></text>
+<text x="490" y="292" text-anchor="middle" font-size="12" fill="#111827"><tspan>→ s×16384（128头×128）</tspan></text>
 <text x="490" y="308" text-anchor="middle" font-size="12" fill="#111827"><tspan>q</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">R</tspan><tspan dy="7"> = RoPE(c</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">Q</tspan><tspan dy="7">(W</tspan><tspan dy="-7" font-size="9">QR</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan><tspan dy="7">)</tspan></text>
-<text x="490" y="328" text-anchor="middle" font-size="12" fill="#111827"><tspan>→ 1×8192（128头×64）</tspan></text>
+<text x="490" y="328" text-anchor="middle" font-size="12" fill="#111827"><tspan>→ s×8192（128头×64）</tspan></text>
 <line x1="490" y1="346" x2="490" y2="386" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <rect x="350" y="386" width="580" height="80" rx="10" fill="#f9fafb" stroke="#9ca3af" stroke-width="1.5"/>
 <text x="640" y="410" text-anchor="middle" font-size="13" fill="#111827" font-weight="bold"><tspan>按头切片拼接（第 i 头）</tspan></text>
@@ -51,16 +51,16 @@
 <line x1="640" y1="466" x2="640" y2="486" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <rect x="50" y="486" width="880" height="84" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
 <text x="490" y="518" text-anchor="middle" font-size="14" fill="#111827"><tspan>o</tspan><tspan dy="5" font-size="10">t,i</tspan><tspan dy="-5"> = Σ</tspan><tspan dy="5" font-size="10">j</tspan><tspan dy="-5"> Softmax( q</tspan><tspan dy="5" font-size="10">t,i</tspan><tspan dy="-5">·k</tspan><tspan dy="5" font-size="10">j,i</tspan><tspan dy="-5"> / √(128+64) ) · v</tspan><tspan dy="5" font-size="10">j,i</tspan><tspan dy="-12" font-size="10">C</tspan></text>
-<text x="490" y="548" text-anchor="middle" font-size="12" fill="#6b7280"><tspan>缩放因子 √192；每头输出 1×128</tspan></text>
+<text x="490" y="548" text-anchor="middle" font-size="12" fill="#6b7280"><tspan>缩放因子 √192；每头输出 s×128</tspan></text>
 <line x1="490" y1="570" x2="490" y2="620" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <rect x="280" y="620" width="420" height="50" rx="10" fill="#f9fafb" stroke="#9ca3af" stroke-width="1.5"/>
-<text x="490" y="651" text-anchor="middle" font-size="13" fill="#111827"><tspan>[ o</tspan><tspan dy="5" font-size="9">t,1</tspan><tspan dy="-5"> ; … ; o</tspan><tspan dy="5" font-size="9">t,128</tspan><tspan dy="-5"> ] 拼接 → 1×16384</tspan></text>
+<text x="490" y="651" text-anchor="middle" font-size="13" fill="#111827"><tspan>[ o</tspan><tspan dy="5" font-size="9">t,1</tspan><tspan dy="-5"> ; … ; o</tspan><tspan dy="5" font-size="9">t,128</tspan><tspan dy="-5"> ] 拼接 → s×16384</tspan></text>
 <line x1="490" y1="670" x2="490" y2="700" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <rect x="330" y="700" width="320" height="44" rx="10" fill="#f9fafb" stroke="#9ca3af" stroke-width="1.5"/>
 <text x="490" y="728" text-anchor="middle" font-size="13" fill="#111827"><tspan>× (W</tspan><tspan dy="-7" font-size="9">O</tspan><tspan dy="7">)</tspan><tspan dy="-7" font-size="9">T</tspan><tspan dy="7">（16384 → 5120）</tspan></text>
 <line x1="490" y1="744" x2="490" y2="786" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
 <rect x="310" y="786" width="360" height="50" rx="10" fill="#faf5ff" stroke="#8b5cf6" stroke-width="1.5"/>
-<text x="490" y="817" text-anchor="middle" font-size="14" fill="#111827" font-weight="bold"><tspan>u</tspan><tspan dy="5" font-size="10">t</tspan><tspan dy="-5">　1×5120 · 送入下一层</tspan></text>
+<text x="490" y="817" text-anchor="middle" font-size="14" fill="#111827" font-weight="bold"><tspan>u</tspan><tspan dy="5" font-size="10">t</tspan><tspan dy="-5">　s×5120 · 送入下一层</tspan></text>
 <rect x="50" y="866" width="880" height="150" rx="10" fill="#fbfdf9" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="70" y="896" text-anchor="start" font-size="13" fill="#111827" font-weight="bold"><tspan>推理要点</tspan></text>
 <text x="70" y="926" text-anchor="start" font-size="12" fill="#111827"><tspan>1. 缓存：每个 token 每层只存 c</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">KV</tspan><tspan dy="7">(512) + k</tspan><tspan dy="5" font-size="9">t</tspan><tspan dy="-12" font-size="9">R</tspan><tspan dy="7">(64) = 576 个元素</tspan></text>
