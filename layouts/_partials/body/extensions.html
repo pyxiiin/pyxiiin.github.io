@@ -1,6 +1,6 @@
 {{/* 侧边装饰只出现在主页和列表页，文章正文页保留两侧留白 */}}
 {{ if ne .Kind "page" }}
-{{ partial "body/attention-decor.html" . }}
+{{ partial "body/side-decor.html" . }}
 {{ end }}
 <style>
     .click-pop {

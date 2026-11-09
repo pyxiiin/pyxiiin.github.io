@@ -163,89 +163,66 @@ $tagline-gradient: linear-gradient(90deg, #22c55e, #06b6d4 55%, #a855f7);
   }
 }
 
-// 两侧的稀疏注意力图样装饰：画布由 layouts/_partials/body/attention-decor.html 驱动。
+// 两侧的抽象光带装饰：画布由 layouts/_partials/body/side-decor.html 驱动。
 // 内容区是 90rem 居中，所以每侧 gutter 为 (100vw - 90rem) / 2，窄屏下直接不渲染。
-.attn-decor {
+.side-decor {
   display: none;
 }
 
-@media only screen and (min-width: 1360px) {
-  .attn-decor {
-    display: flex;
+@media only screen and (min-width: 1200px) {
+  .side-decor {
+    display: block;
     position: fixed;
     top: 0;
     bottom: 0;
     z-index: -1;
     width: calc((100vw - 90rem) / 2);
-    align-items: center;
-    justify-content: center;
     pointer-events: none;
     user-select: none;
+    opacity: 0;
+    animation: side-decor-in 2.4s 0.6s ease-out forwards;
   }
 
-  .attn-decor--left {
+  .side-decor--left {
     left: 0;
   }
 
-  .attn-decor--right {
+  .side-decor--right {
     right: 0;
   }
 
-  .attn-decor__inner {
-    width: calc(100% - 5rem);
-    max-width: 20rem;
-    opacity: 0;
-    animation: attn-decor-in 1.6s 0.4s ease-out forwards;
-  }
-
-  .attn-decor__canvas {
+  .side-decor__canvas {
     display: block;
     width: 100%;
-    aspect-ratio: 1;
-  }
-
-  // 右侧水平镜像，让两张图样对称地框住正文
-  .attn-decor--right .attn-decor__canvas {
-    transform: scaleX(-1);
-  }
-
-  .attn-decor__label {
-    display: block;
-    margin-top: 1rem;
-    font-family: $mono;
-    font-size: 1.1rem;
-    letter-spacing: 0.08em;
-    text-align: center;
-    color: currentColor;
-    opacity: 0.3;
+    height: 100%;
   }
 }
 
-@keyframes attn-decor-in {
+@keyframes side-decor-in {
   to {
-    opacity: var(--attn-decor-opacity);
+    opacity: var(--side-decor-opacity);
   }
 }
 
 // 浅色背景下同样的颜色观感更淡，整体提一档
-.attn-decor {
-  --attn-decor-opacity: 0.75;
+.side-decor {
+  --side-decor-opacity: 0.9;
 }
 
-.colorscheme-light .attn-decor {
-  --attn-decor-opacity: 1;
+.colorscheme-light .side-decor {
+  --side-decor-opacity: 1;
 }
 
 @media (prefers-color-scheme: light) {
-  .colorscheme-auto .attn-decor {
-    --attn-decor-opacity: 1;
+  .colorscheme-auto .side-decor {
+    --side-decor-opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .attn-decor__inner {
+  .side-decor {
     animation: none;
-    opacity: var(--attn-decor-opacity);
+    opacity: var(--side-decor-opacity);
   }
 }
 

@@ -1,0 +1,163 @@
+<div class="side-decor side-decor--left" aria-hidden="true">
+  <canvas class="side-decor__canvas" data-seed="17"></canvas>
+</div>
+<div class="side-decor side-decor--right" aria-hidden="true">
+  <canvas class="side-decor__canvas" data-seed="88"></canvas>
+</div>
+<script>
+  (() => {
+    const canvases = document.querySelectorAll(".side-decor__canvas");
+    if (!canvases.length) return;
+
+    const GRAY = "156, 163, 175";
+    const ACCENT = "34, 197, 94";
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const makeRand = (seed) => {
+      let s = seed >>> 0 || 1;
+      return () => {
+        s ^= s << 13;
+        s ^= s >>> 17;
+        s ^= s << 5;
+        return ((s >>> 0) % 100000) / 100000;
+      };
+    };
+
+    // 左右两侧用不同的疏密和速度，避免看起来像镜像
+    const VARIANTS = [
+      { clusters: 5, perCluster: [2, 6], speed: [3, 12], len: [0.1, 0.55] },
+      { clusters: 7, perCluster: [3, 7], speed: [5, 20], len: [0.06, 0.34] },
+    ];
+
+    const panels = [...canvases].map((canvas, i) => ({
+      canvas,
+      ctx: canvas.getContext("2d"),
+      rand: makeRand(Number(canvas.dataset.seed) * 2654435761),
+      variant: VARIANTS[i % VARIANTS.length],
+      lines: [],
+      w: 0,
+      h: 0,
+      dpr: 1,
+    }));
+
+    // 不规则成簇分布，比均匀散开更像有人安排过
+    const build = (p) => {
+      const { rand, variant, w, h } = p;
+      const pick = ([lo, hi]) => lo + rand() * (hi - lo);
+      const lines = [];
+      const accentAt = Math.floor(rand() * variant.clusters);
+
+      // 每簇落在自己的一条竖带里，保证横向铺得开，带内位置仍然随机
+      const band = w / variant.clusters;
+      for (let c = 0; c < variant.clusters; c++) {
+        const cx = (c + 0.15 + rand() * 0.7) * band;
+        const count = Math.round(pick(variant.perCluster));
+        for (let k = 0; k < count; k++) {
+          const accent = c === accentAt && k === 0;
+          const len = pick(variant.len) * h;
+          const line = {
+            x: Math.round(cx + (rand() - 0.5) * w * 0.22) + 0.5,
+            len,
+            width: rand() < 0.22 ? 2 : 1,
+            speed: pick(variant.speed) * (0.4 + rand()),
+            offset: rand() * (h + len),
+            // 每根线有自己的呼吸周期和相位，整体就不会同步
+            freq: 0.08 + rand() * 0.22,
+            phase: rand() * Math.PI * 2,
+            peak: accent ? 0.3 + rand() * 0.18 : 0.1 + rand() * 0.18,
+            accent,
+          };
+          lines.push(line);
+        }
+      }
+      p.lines = lines;
+      p.grads = null;
+    };
+
+    // 两端渐隐，线条才像光痕而不是柱子；渐变按线长缓存，绘制时平移画布复用
+    const prepare = (p) => {
+      const { ctx, dpr } = p;
+      p.grads = p.lines.map((l) => {
+        const g = ctx.createLinearGradient(0, 0, 0, l.len * dpr);
+        const rgb = l.accent ? ACCENT : GRAY;
+        g.addColorStop(0, `rgba(${rgb}, 0)`);
+        g.addColorStop(0.5, `rgba(${rgb}, 1)`);
+        g.addColorStop(1, `rgba(${rgb}, 0)`);
+        return g;
+      });
+    };
+
+    const resize = (p) => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = p.canvas.clientWidth;
+      const h = p.canvas.clientHeight;
+      if (!w || !h) return;
+      p.dpr = dpr;
+      p.w = w;
+      p.h = h;
+      p.canvas.width = Math.round(w * dpr);
+      p.canvas.height = Math.round(h * dpr);
+      build(p);
+      prepare(p);
+    };
+
+    const draw = (p, t) => {
+      const { ctx, dpr, h } = p;
+      if (!p.grads) return;
+      ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+      ctx.lineCap = "round";
+
+      p.lines.forEach((l, i) => {
+        const span = h + l.len;
+        const y = ((l.offset + t * l.speed) % span) - l.len;
+        // 用 sin 的平方做呼吸，暗的时间比亮的时间长，节奏更松弛
+        const s = Math.sin(t * l.freq + l.phase);
+        const a = l.peak * (0.25 + 0.75 * s * s);
+        if (a < 0.005) return;
+
+        ctx.save();
+        ctx.translate(l.x * dpr, y * dpr);
+        ctx.globalAlpha = a;
+        ctx.fillStyle = p.grads[i];
+        ctx.fillRect(-(l.width * dpr) / 2, 0, l.width * dpr, l.len * dpr);
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    };
+
+    panels.forEach((p) => {
+      resize(p);
+      if (reduced) draw(p, 0);
+    });
+
+    if (reduced) return;
+
+    let raf = null;
+    let t0 = 0;
+
+    const frame = (now) => {
+      raf = requestAnimationFrame(frame);
+      if (!t0) t0 = now;
+      const t = (now - t0) / 1000;
+      for (const p of panels) draw(p, t);
+    };
+
+    const start = () => {
+      if (raf === null) raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      if (raf !== null) cancelAnimationFrame(raf);
+      raf = null;
+    };
+
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(() => panels.forEach(resize));
+      panels.forEach((p) => ro.observe(p.canvas));
+    } else {
+      window.addEventListener("resize", () => panels.forEach(resize));
+    }
+    start();
+  })();
+</script>
