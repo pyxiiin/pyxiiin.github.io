@@ -11,6 +11,10 @@
 
     const GRAY = "156, 163, 175";
     const ACCENT = "34, 197, 94";
+    const FONT_SIZE = 13;
+    const ROW_H = 17;
+    const COL_W = 15;
+    const FPS = 30;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -26,8 +30,8 @@
 
     // 左右两侧用不同的疏密和速度，避免看起来像镜像
     const VARIANTS = [
-      { clusters: 5, perCluster: [2, 6], speed: [3, 12], len: [0.1, 0.55] },
-      { clusters: 7, perCluster: [3, 7], speed: [5, 20], len: [0.06, 0.34] },
+      { fill: 0.42, tail: [10, 22], step: [90, 200], peak: [0.16, 0.34] },
+      { fill: 0.58, tail: [6, 14], step: [60, 140], peak: [0.13, 0.27] },
     ];
 
     const panels = [...canvases].map((canvas, i) => ({
@@ -35,57 +39,47 @@
       ctx: canvas.getContext("2d"),
       rand: makeRand(Number(canvas.dataset.seed) * 2654435761),
       variant: VARIANTS[i % VARIANTS.length],
-      lines: [],
-      w: 0,
-      h: 0,
+      streams: [],
+      cols: 0,
+      rows: 0,
       dpr: 1,
     }));
 
-    // 不规则成簇分布，比均匀散开更像有人安排过
-    const build = (p) => {
-      const { rand, variant, w, h } = p;
-      const pick = ([lo, hi]) => lo + rand() * (hi - lo);
-      const lines = [];
-      const accentAt = Math.floor(rand() * variant.clusters);
+    // 一个字元：多数是 0/1，少数是实心小方块
+    const makeGlyph = (rand) => (rand() < 0.26 ? null : rand() < 0.5 ? "0" : "1");
 
-      // 每簇落在自己的一条竖带里，保证横向铺得开，带内位置仍然随机
-      const band = w / variant.clusters;
-      for (let c = 0; c < variant.clusters; c++) {
-        const cx = (c + 0.15 + rand() * 0.7) * band;
-        const count = Math.round(pick(variant.perCluster));
-        for (let k = 0; k < count; k++) {
-          const accent = c === accentAt && k === 0;
-          const len = pick(variant.len) * h;
-          const line = {
-            x: Math.round(cx + (rand() - 0.5) * w * 0.22) + 0.5,
-            len,
-            width: rand() < 0.22 ? 2 : 1,
-            speed: pick(variant.speed) * (0.4 + rand()),
-            offset: rand() * (h + len),
-            // 每根线有自己的呼吸周期和相位，整体就不会同步
-            freq: 0.08 + rand() * 0.22,
-            phase: rand() * Math.PI * 2,
-            peak: accent ? 0.3 + rand() * 0.18 : 0.1 + rand() * 0.18,
-            accent,
-          };
-          lines.push(line);
-        }
-      }
-      p.lines = lines;
-      p.grads = null;
+    const spawn = (p, stream, initial) => {
+      const { rand, variant } = p;
+      const pick = ([lo, hi]) => lo + rand() * (hi - lo);
+      stream.tail = Math.round(pick(variant.tail));
+      stream.step = pick(variant.step);
+      stream.peak = pick(variant.peak);
+      stream.accent = rand() < 0.1;
+      stream.acc = 0;
+      // 若隐若现：每条流有自己的呼吸周期和相位
+      stream.freq = 0.1 + rand() * 0.25;
+      stream.phase = rand() * Math.PI * 2;
+      stream.head = initial
+        ? Math.floor(rand() * p.rows)
+        : -stream.tail - Math.floor(rand() * 18);
+      stream.cells = Array.from({ length: stream.tail }, () => makeGlyph(rand));
     };
 
-    // 两端渐隐，线条才像光痕而不是柱子；渐变按线长缓存，绘制时平移画布复用
-    const prepare = (p) => {
-      const { ctx, dpr } = p;
-      p.grads = p.lines.map((l) => {
-        const g = ctx.createLinearGradient(0, 0, 0, l.len * dpr);
-        const rgb = l.accent ? ACCENT : GRAY;
-        g.addColorStop(0, `rgba(${rgb}, 0)`);
-        g.addColorStop(0.5, `rgba(${rgb}, 1)`);
-        g.addColorStop(1, `rgba(${rgb}, 0)`);
-        return g;
-      });
+    const build = (p) => {
+      const { rand, variant } = p;
+      p.streams = [];
+      const slots = [...Array(p.cols).keys()];
+      // 洗牌后取前若干列，列的选择本身就不规则
+      for (let i = slots.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [slots[i], slots[j]] = [slots[j], slots[i]];
+      }
+      const n = Math.max(1, Math.round(p.cols * variant.fill));
+      for (let i = 0; i < n; i++) {
+        const stream = { col: slots[i] };
+        spawn(p, stream, true);
+        p.streams.push(stream);
+      }
     };
 
     const resize = (p) => {
@@ -94,70 +88,123 @@
       const h = p.canvas.clientHeight;
       if (!w || !h) return;
       p.dpr = dpr;
-      p.w = w;
-      p.h = h;
       p.canvas.width = Math.round(w * dpr);
       p.canvas.height = Math.round(h * dpr);
+      p.cols = Math.max(1, Math.floor(w / COL_W));
+      p.rows = Math.ceil(h / ROW_H) + 2;
+      p.offsetX = (w - p.cols * COL_W) / 2 + COL_W / 2;
       build(p);
-      prepare(p);
+    };
+
+    const advance = (p, dt, t) => {
+      for (const s of p.streams) {
+        s.acc += dt;
+        while (s.acc >= s.step) {
+          s.acc -= s.step;
+          s.head++;
+          s.cells.pop();
+          s.cells.unshift(makeGlyph(p.rand));
+        }
+        // 偶尔就地变换一个字元，制造闪动
+        if (p.rand() < 0.02) {
+          s.cells[Math.floor(p.rand() * s.cells.length)] = makeGlyph(p.rand);
+        }
+        if (s.head - s.tail > p.rows) spawn(p, s, false);
+      }
     };
 
     const draw = (p, t) => {
-      const { ctx, dpr, h } = p;
-      if (!p.grads) return;
+      const { ctx, dpr } = p;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
-      ctx.lineCap = "round";
+      ctx.font = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
-      p.lines.forEach((l, i) => {
-        const span = h + l.len;
-        const y = ((l.offset + t * l.speed) % span) - l.len;
-        // 用 sin 的平方做呼吸，暗的时间比亮的时间长，节奏更松弛
-        const s = Math.sin(t * l.freq + l.phase);
-        const a = l.peak * (0.25 + 0.75 * s * s);
-        if (a < 0.005) return;
+      const block = FONT_SIZE * 0.46;
 
-        ctx.save();
-        ctx.translate(l.x * dpr, y * dpr);
-        ctx.globalAlpha = a;
-        ctx.fillStyle = p.grads[i];
-        ctx.fillRect(-(l.width * dpr) / 2, 0, l.width * dpr, l.len * dpr);
-        ctx.restore();
+      for (const s of p.streams) {
+        const breath = 0.35 + 0.65 * Math.pow(Math.sin(t * s.freq + s.phase), 2);
+        const x = p.offsetX + s.col * COL_W;
+
+        for (let k = 0; k < s.tail; k++) {
+          const row = s.head - k;
+          if (row < 0 || row > p.rows) continue;
+          const glyph = s.cells[k];
+          // 头部最亮，向尾部非线性衰减
+          const fade = Math.pow(1 - k / s.tail, 1.5);
+          const a = s.peak * breath * fade * (k === 0 ? 1.8 : 1);
+          if (a < 0.006) continue;
+
+          const rgb = s.accent && k === 0 ? ACCENT : GRAY;
+          ctx.fillStyle = `rgba(${rgb}, ${a})`;
+          const y = row * ROW_H + ROW_H / 2;
+          if (glyph === null) {
+            ctx.fillRect(x - block / 2, y - block / 2, block, block);
+          } else {
+            ctx.fillText(glyph, x, y);
+          }
+        }
+      }
+    };
+
+    const init = () => {
+      panels.forEach((p) => {
+        resize(p);
+        if (reduced) draw(p, 0);
       });
-      ctx.globalAlpha = 1;
+
+      if (reduced) return;
+
+      let raf = null;
+      let t0 = 0;
+      let prev = 0;
+      let lastDraw = 0;
+
+      const frame = (now) => {
+        raf = requestAnimationFrame(frame);
+        if (!t0) {
+          t0 = prev = lastDraw = now;
+          return;
+        }
+        const dt = Math.min(now - prev, 200);
+        prev = now;
+        const t = (now - t0) / 1000;
+
+        for (const p of panels) advance(p, dt, t);
+
+        // 数字雨本身是离散的，30fps 足够且省开销
+        if (now - lastDraw < 1000 / FPS) return;
+        lastDraw = now;
+        for (const p of panels) draw(p, t);
+      };
+
+      const start = () => {
+        if (raf === null) {
+          t0 = 0;
+          raf = requestAnimationFrame(frame);
+        }
+      };
+      const stop = () => {
+        if (raf !== null) cancelAnimationFrame(raf);
+        raf = null;
+      };
+
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => panels.forEach(resize));
+        panels.forEach((p) => ro.observe(p.canvas));
+      } else {
+        window.addEventListener("resize", () => panels.forEach(resize));
+      }
+      start();
     };
 
-    panels.forEach((p) => {
-      resize(p);
-      if (reduced) draw(p, 0);
-    });
-
-    if (reduced) return;
-
-    let raf = null;
-    let t0 = 0;
-
-    const frame = (now) => {
-      raf = requestAnimationFrame(frame);
-      if (!t0) t0 = now;
-      const t = (now - t0) / 1000;
-      for (const p of panels) draw(p, t);
-    };
-
-    const start = () => {
-      if (raf === null) raf = requestAnimationFrame(frame);
-    };
-    const stop = () => {
-      if (raf !== null) cancelAnimationFrame(raf);
-      raf = null;
-    };
-
-    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
-    if (window.ResizeObserver) {
-      const ro = new ResizeObserver(() => panels.forEach(resize));
-      panels.forEach((p) => ro.observe(p.canvas));
+    // 等字体就绪再测量，否则首帧会用回退字体的字形
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(init);
     } else {
-      window.addEventListener("resize", () => panels.forEach(resize));
+      init();
     }
-    start();
   })();
 </script>
