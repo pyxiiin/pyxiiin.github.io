@@ -6,6 +6,11 @@
     .click-burst {
         position: fixed;
         inset: 0;
+        /* canvas 是替换元素，不写死宽高会按固有尺寸（= width 属性）排版，
+           在 dpr>1 的屏幕上会被放大，导致绘制坐标和点击坐标对不上 */
+        display: block;
+        width: 100%;
+        height: 100%;
         z-index: 9999;
         pointer-events: none;
         user-select: none;
@@ -17,6 +22,9 @@
 
         const GRAY = "156, 163, 175";
         const ACCENT = "34, 197, 94";
+        const FONT_SIZE = 13; // 和两侧数字雨保持一致
+        const BLOCK = FONT_SIZE * 0.46;
+        const FONT = `${FONT_SIZE}px "JetBrains Mono", ui-monospace, monospace`;
         const GRAVITY = 520; // px/s²
         const DRAG = 0.985; // 每 1/60 秒的速度衰减
 
@@ -47,6 +55,7 @@
 
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, innerWidth, innerHeight);
+            ctx.font = FONT;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
 
@@ -72,10 +81,8 @@
                 const a = p.peak * Math.pow(1 - p.age / p.life, 1.6);
                 ctx.fillStyle = `rgba(${p.accent ? ACCENT : GRAY}, ${a})`;
                 if (p.glyph === null) {
-                    const b = p.size * 0.46;
-                    ctx.fillRect(p.x - b / 2, p.y - b / 2, b, b);
+                    ctx.fillRect(p.x - BLOCK / 2, p.y - BLOCK / 2, BLOCK, BLOCK);
                 } else {
-                    ctx.font = `${p.size}px "JetBrains Mono", ui-monospace, monospace`;
                     ctx.fillText(p.glyph, p.x, p.y);
                 }
             }
@@ -89,22 +96,22 @@
         };
 
         document.addEventListener("click", (e) => {
-            const n = 7 + Math.floor(Math.random() * 5);
+            const n = 18 + Math.floor(Math.random() * 9);
             for (let i = 0; i < n; i++) {
                 // 向上为主、左右张开的扇形
-                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 2.4;
-                const speed = 90 + Math.random() * 170;
+                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 2.6;
+                // 速度分布偏慢，少数飞得远，避免密度提高后糊成一团
+                const speed = 70 + Math.pow(Math.random(), 1.7) * 230;
                 particles.push({
-                    x: e.clientX + (Math.random() - 0.5) * 8,
-                    y: e.clientY + (Math.random() - 0.5) * 8,
+                    x: e.clientX + (Math.random() - 0.5) * 10,
+                    y: e.clientY + (Math.random() - 0.5) * 10,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
                     glyph: makeGlyph(),
-                    size: 11 + Math.random() * 3,
-                    peak: 0.45 + Math.random() * 0.35,
-                    accent: Math.random() < 0.2,
+                    peak: 0.34 + Math.random() * 0.3,
+                    accent: Math.random() < 0.16,
                     age: 0,
-                    life: 0.65 + Math.random() * 0.45,
+                    life: 0.6 + Math.random() * 0.5,
                 });
             }
             if (raf === null) {
