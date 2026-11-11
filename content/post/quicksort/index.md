@@ -3,8 +3,8 @@ title: '快速排序算法：原理与C++实现'
 description: '用 C++ 讲清楚快速排序的分治思想、分区写法、复杂度，以及面试常问坑点'
 date: '2026-11-02T22:50:26+08:00'
 slug: 'quicksort'
-categories: [算法]
-tags: [C/C++, 面经, 快速排序]
+categories: [Data Structures and Algorithms]
+tags: [C/C++, 快速排序]
 draft: false
 ---
 

@@ -3,8 +3,8 @@ title: '堆排序算法：原理与C++实现'
 description: '用 C++ 讲清楚堆排序的建堆、下沉、复杂度，以及面试常问的稳定性和 Top-K 问题'
 date: '2026-11-07T11:09:36+08:00'
 slug: 'heap-sort'
-categories: [算法]
-tags: [C/C++, 面经, 堆排序]
+categories: [Data Structures and Algorithms]
+tags: [C/C++, 堆排序]
 draft: false
 ---
 

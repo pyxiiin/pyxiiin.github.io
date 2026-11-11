@@ -4,7 +4,7 @@ description: '详细讲清楚 DeepSeek 提出的 MLA：低秩压缩 KV、解耦 
 date: '2026-11-07T16:32:20+08:00'
 slug: 'mla'
 categories: [LLM]
-tags: [LLM, MLA, 注意力机制, DeepSeek, 面经]
+tags: [LLM, MLA, 注意力机制, DeepSeek]
 math: true
 draft: false
 ---
